@@ -10,35 +10,29 @@ struct GameContainerView: View {
     var body: some View {
         @Bindable var appState = appState
         @Bindable var gameModel = gameModel
-        VStack {
-            
-            TopBar()
-
-            GeometryReader { proxy in
+        GeometryReader { proxy in
+            VStack(alignment: .center) {
+                TopBar()
+                Spacer()
                 GameView(viewModel: gameModel)
-                    .background(.black)
-                    .onTapGesture { location in
-                        let index = getIndex(atLocation: location,
-                                             gridSize: gameModel.gridSize,
-                                             frameSize: proxy.size)
-                        gameModel.insertPattern(atIndex: index)
-                    }
-                    .frame(maxHeight: .infinity)
-            }
-            .sheet(isPresented: $appState.showingSettings) {
-                resetTimer()
-            } content: {
-                GameSettings()
-            }
-            .onAppear() {
-                resetTimer()
-            }
-            
-            GroupBox {
-                Text(gameModel.selectedPattern.id + " \(gameModel.selectedPattern.size())")
+                    .frame(maxWidth: proxy.size.width,
+                           maxHeight: proxy.size.width)
                     .padding()
-            } label: {
-                PatternPicker(selectedPattern: $gameModel.selectedPattern)
+                    .onAppear() {
+                        resetTimer()
+                    }
+                    .sheet(isPresented: $appState.showingSettings) {
+                        resetTimer()
+                    } content: {
+                        GameSettings()
+                    }
+                Spacer()
+                GroupBox {
+                    PatternPicker(selectedPattern: $gameModel.selectedPattern)
+                } label: {
+                    Text(gameModel.selectedPattern.id + " \(gameModel.selectedPattern.size())")
+                        .padding()
+                }
             }
         }
     }
@@ -49,11 +43,6 @@ struct GameContainerView: View {
         timer = Timer.scheduledTimer(withTimeInterval: 1/Double(appState.timeStepsPerSecond), repeats: true) {_ in
             gameModel.update(gameModel.timeStep + 1)
         }
-    }
-    
-    private func getIndex(atLocation location: CGPoint, gridSize: (Int, Int), frameSize: CGSize) -> (Int, Int) {
-        let ratio = (location.x / frameSize.width, location.y / frameSize.height)
-        return (Int(floor(ratio.0 * CGFloat(gridSize.0))), Int(floor(ratio.1 * CGFloat(gridSize.1))))
     }
 }
 

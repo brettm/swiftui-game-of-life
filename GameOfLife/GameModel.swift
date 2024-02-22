@@ -15,21 +15,16 @@ struct Cell {
 @Observable
 class GameViewModel {
     
-    internal init(minGridSize: (Int, Int)? = nil, selectedPattern: any Pattern = Beehive())
-    {
+    internal init(minGridSize: (Int, Int)? = nil, selectedPattern: any Pattern = Beehive()) {
         self.selectedPattern = selectedPattern
         self.gridSize = minGridSize ?? selectedPattern.size()
-        if gridSize < selectedPattern.size() {
-            gridSize = selectedPattern.size()
-        }
+        if gridSize < selectedPattern.size() { gridSize = selectedPattern.size() }
         self.cells = createCells()
     }
     
     // Resolution of the game
     var gridSize: (Int, Int) {
-        didSet {
-            resetCells()
-        }
+        didSet { resetCells() }
     }
     var selectedPattern: any Pattern
     

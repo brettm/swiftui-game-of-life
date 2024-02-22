@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct GameView: View {
+struct GameCanvas: View {
     @Environment(AppState.self) var appState: AppState
     var viewModel: GameViewModel
     var body: some View {
@@ -17,18 +17,40 @@ struct GameView: View {
             _ = viewModel.cells.map { column in
                 return column.filter{ $0.isActive }.map { cell in
                     context.fill(
-                        Path(getRekt(index: cell.index, cellSize: cellSize)),
+                        Path(getRect(index: cell.index, cellSize: cellSize)),
                         with: .color(appState.cellColor)
                     )
                 }
             }
         }
-        .background(appState.gameBackgroundColor)
     }
-    func getRekt(index: (Int, Int), cellSize: CGSize) -> CGRect {
+        
+    func getRect(index: (Int, Int), cellSize: CGSize) -> CGRect {
         return CGRect(x: CGFloat(index.0) * cellSize.width,
                       y: CGFloat(index.1) * cellSize.height,
                       width: cellSize.width, height: cellSize.height)
+    }
+}
+
+struct GameView: View {
+    @Environment(AppState.self) var appState: AppState
+    var viewModel: GameViewModel
+    var body: some View {
+        GeometryReader { proxy in
+            GameCanvas(viewModel: viewModel)
+            .onTapGesture { location in
+                let index = getIndex(atLocation: location,
+                                     gridSize: viewModel.gridSize,
+                                     frameSize: proxy.size)
+                viewModel.insertPattern(atIndex: index)
+            }
+            .background(appState.gameBackgroundColor)
+        }
+    }
+    
+    private func getIndex(atLocation location: CGPoint, gridSize: (Int, Int), frameSize: CGSize) -> (Int, Int) {
+        let ratio = (location.x / frameSize.width, location.y / frameSize.height)
+        return (Int(floor(ratio.0 * CGFloat(gridSize.0))), Int(floor(ratio.1 * CGFloat(gridSize.1))))
     }
 }
 

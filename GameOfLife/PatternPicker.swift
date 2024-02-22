@@ -9,7 +9,7 @@ struct PatternPicker: View {
                 ForEach(appState.patterns, id: \.id) { pattern in
                     GroupBox {
                         let model = GameViewModel(selectedPattern: pattern).insertPattern()
-                        GameView(viewModel: model)
+                        GameCanvas(viewModel: model)
                             .frame(width: 60, height: 60)
                             .onTapGesture {
                                 selectedPattern = pattern
