@@ -9,48 +9,51 @@ import SwiftUI
 
 struct GameCanvas: View {
     @Environment(AppState.self) var appState: AppState
-    var viewModel: GameViewModel
+    var gameState: GameState?
+    var gameSize: GameSize {
+        return gameState?.gameSize ?? appState.gameSize
+    }
+    var cells: [[Cell]] {
+        return gameState?.cells ?? appState.gameState.cells
+    }
     var body: some View {
+        EmptyView()
         Canvas(opaque: false) { context, size in
-            let cellSize = CGSize(width: size.width/Double(viewModel.gridSize.0),
-                                  height: size.height/Double(viewModel.gridSize.1))
-            _ = viewModel.cells.map { column in
-                return column.filter{ $0.isActive }.map { cell in
+            let cellSize = CGSize(width: size.width/Double(gameSize.width), height: size.height/Double(gameSize.height))
+            _ = cells.map { row in
+                return row.filter{ $0.isActive }.map { cell in
                     context.fill(
-                        Path(getRect(index: cell.index, cellSize: cellSize)),
-                        with: .color(appState.cellColor)
+                        Path( getRect(indexPath: cell.index, cellSize: cellSize) ),
+                        with: .color(appState.appColors.cellColor)
                     )
                 }
             }
         }
     }
         
-    func getRect(index: (Int, Int), cellSize: CGSize) -> CGRect {
-        return CGRect(x: CGFloat(index.0) * cellSize.width,
-                      y: CGFloat(index.1) * cellSize.height,
-                      width: cellSize.width, height: cellSize.height)
+    private func getRect(indexPath: IndexPath, cellSize: CGSize) -> CGRect {
+        return CGRect(x: CGFloat(indexPath.row) * cellSize.width, y: CGFloat(indexPath.section) * cellSize.height, width: cellSize.width, height: cellSize.height)
     }
 }
 
 struct GameView: View {
     @Environment(AppState.self) var appState: AppState
-    var viewModel: GameViewModel
     var body: some View {
         GeometryReader { proxy in
-            GameCanvas(viewModel: viewModel)
+            GameCanvas()
             .onTapGesture { location in
-                let index = getIndex(atLocation: location,
-                                     gridSize: viewModel.gridSize,
-                                     frameSize: proxy.size)
-                viewModel.insertPattern(atIndex: index)
+                let indexPath = getIndex(atLocation: location, gameSize: appState.gameSize, frameSize: proxy.size)
+                appState.gameState = appState.gameState.insertPattern(appState.selectedPattern, atIndexPath: indexPath)
             }
-            .background(appState.gameBackgroundColor)
+            .background(appState.appColors.gameBackgroundColor)
         }
     }
     
-    private func getIndex(atLocation location: CGPoint, gridSize: (Int, Int), frameSize: CGSize) -> (Int, Int) {
+    private func getIndex(atLocation location: CGPoint, gameSize: GameSize, frameSize: CGSize) -> IndexPath {
         let ratio = (location.x / frameSize.width, location.y / frameSize.height)
-        return (Int(floor(ratio.0 * CGFloat(gridSize.0))), Int(floor(ratio.1 * CGFloat(gridSize.1))))
+        return IndexPath(
+            row: Int(floor(ratio.1 * CGFloat(gameSize.height))),
+            section: Int(floor(ratio.0 * CGFloat(gameSize.width))))
     }
 }
 

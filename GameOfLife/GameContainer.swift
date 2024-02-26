@@ -3,24 +3,18 @@ import SwiftUI
 struct GameContainerView: View {
     
     @Environment(AppState.self) var appState: AppState
-    @Environment(GameViewModel.self) var gameModel: GameViewModel
-    
     @State var timer: Timer?
     
     var body: some View {
         @Bindable var appState = appState
-        @Bindable var gameModel = gameModel
         GeometryReader { proxy in
             VStack(alignment: .center) {
                 TopBar()
                 Spacer()
-                GameView(viewModel: gameModel)
-                    .frame(maxWidth: proxy.size.width,
-                           maxHeight: proxy.size.width)
+                GameView()
+                    .frame(maxWidth: proxy.size.width, maxHeight: proxy.size.width)
                     .padding()
-                    .onAppear() {
-                        resetTimer()
-                    }
+                    .task { startTimer() }
                     .sheet(isPresented: $appState.showingSettings) {
                         resetTimer()
                     } content: {
@@ -28,33 +22,47 @@ struct GameContainerView: View {
                     }
                 Spacer()
                 GroupBox {
-                    PatternPicker(selectedPattern: $gameModel.selectedPattern)
+                    PatternPicker(patterns: appState.allPatterns, selectedPattern: $appState.selectedPattern)
                 } label: {
-                    Text(gameModel.selectedPattern.id + " \(gameModel.selectedPattern.size())")
+                    Text(appState.selectedPattern.id + " \(appState.selectedPattern.size())")
                         .padding()
                 }
             }
         }
     }
     
-    private func resetTimer() {
+    private func stopTimer() {
         timer?.invalidate()
         timer = nil
-        timer = Timer.scheduledTimer(withTimeInterval: 1/Double(appState.timeStepsPerSecond), repeats: true) {_ in
-            gameModel.update(gameModel.timeStep + 1)
+    }
+    
+    private func startTimer() {
+        let timer = Timer.scheduledTimer(withTimeInterval: 1/Double(appState.timeStepsPerSecond), repeats: true) {timer in
+           updateState()
         }
+        RunLoop.current.add(timer, forMode: .common)
+        self.timer = timer
+    }
+    
+    private func resetTimer() {
+        stopTimer()
+        startTimer()
+    }
+    
+    private func updateState() {
+        appState.gameState.update(appState.gameState.timeStep + 1)
     }
 }
 
 private struct TopBar: View {
     @Environment(AppState.self) var appState: AppState
-    @Environment(GameViewModel.self) var gameModel: GameViewModel
-    
     var body: some View {
         HStack {
-            Button("Clear") { gameModel.resetCells() }
+            Button("Clear") {
+                appState.gameState.resetCells()
+            }
             Spacer()
-            Text("Time Step: \(gameModel.timeStep)")
+            Text("Time Step: \(appState.gameState.timeStep)")
             Spacer()
             Button {
                 appState.showingSettings.toggle()

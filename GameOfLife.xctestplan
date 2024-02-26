@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "ECB97131-97D0-4665-9E4A-11C5C8B3790C",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:GameOfLife.xcodeproj",
+        "identifier" : "8B9AB8272B8CB00300F71617",
+        "name" : "GameOfLifeTests"
+      }
+    }
+  ],
+  "version" : 1
+}

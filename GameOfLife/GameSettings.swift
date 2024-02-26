@@ -17,13 +17,13 @@ struct GameSettings: View {
             .padding()
             Form {
                 Section(header: Text("Theme")) {
-                    ColorPicker("Cell Color", selection: $appState.cellColor)
-                    ColorPicker("Game Background", selection: $appState.gameBackgroundColor)
+                    ColorPicker("Cell Color", selection: $appState.appColors.cellColor)
+                    ColorPicker("Game Background", selection: $appState.appColors.gameBackgroundColor)
                 }
                 Section(header: Text("Game")) {
                     Stepper("\(appState.timeStepsPerSecond) tick per second", value: $appState.timeStepsPerSecond, in: 1...30)
-                    Stepper("\(appState.gridSize.0) grid width", value: $appState.gridSize.0, in: 100...200)
-                    Stepper("\(appState.gridSize.1) grid height", value: $appState.gridSize.1, in: 100...200)
+                    Stepper("\(appState.gameSize.width) grid width", value: $appState.gameSize.width, in: 100...200)
+                    Stepper("\(appState.gameSize.height) grid height", value: $appState.gameSize.height, in: 100...200)
                 }
             }
         }

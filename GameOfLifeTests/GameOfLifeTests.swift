@@ -2,10 +2,11 @@
 //  GameOfLifeTests.swift
 //  GameOfLifeTests
 //
-//  Created by Brett Meader on 21/02/2024.
+//  Created by Brett Meader on 26/02/2024.
 //
 
 import XCTest
+
 @testable import GameOfLife
 
 final class GameOfLifeTests: XCTestCase {
@@ -18,19 +19,26 @@ final class GameOfLifeTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
-    }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+    func testGameState() {
+        var state = GameState(minGameSize: GameSize(width: 1, height: 2))
+        XCTAssert(state.cells.count == 2)
+        XCTAssert(state.cells.first!.count == 1)
+        let beehive = Beehive()
+        let beehiveSize = beehive.size()
+        XCTAssert(beehiveSize.0 == 4)
+        XCTAssert(beehiveSize.1 == 3)
+        state=state.insertPattern(Beehive())
+        XCTAssert(state.cells.count == 3)
+        XCTAssert(state.cells.first!.count == 4)
+        let expected = [
+            [0, 1, 1, 0],
+            [1, 0, 0, 1],
+            [0, 1, 1, 0]
+        ]
+        for (row_idx, cells) in state.cells.enumerated() {
+            for (col_idx, cell) in cells.enumerated() {
+                XCTAssert((expected[row_idx][col_idx] == 1) == cell.isActive)
+            }
         }
     }
-
 }
