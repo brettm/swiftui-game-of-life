@@ -1,6 +1,6 @@
 # swiftui-game-of-life
 
-#### Welcome to a Classic Game of Life simulation, implemented using SwiftUI canvas to visualize the evolving cells.
+Welcome to a Classic Game of Life simulation, implemented using SwiftUI canvas to visualise the evolving cells.
 
 This project is a fun experiment rather than an optimisation endeavor. While it could potentially be optimised using Metal and fragment shaders for peak performance, the primary aim here is to explore the capabilities of SwiftUI canvas.
 
