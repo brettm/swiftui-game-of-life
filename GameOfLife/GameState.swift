@@ -26,14 +26,15 @@ struct GameState: Sendable {
     
     // Resolution of the game
     public var gameSize: GameSize {
-        didSet { resetCells() }
+        didSet { reset() }
     }
     
     private(set) var timeStep: UInt64 = 0
     private(set) var cells: [[Cell]] = [[]]
     
-    public mutating func resetCells() {
+    public mutating func reset() {
         cells = createCells()
+        timeStep = 0
     }
     
     public mutating func update(_ timeStep: UInt64) {

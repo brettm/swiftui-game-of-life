@@ -59,7 +59,7 @@ private struct TopBar: View {
     var body: some View {
         HStack {
             Button("Clear") {
-                appState.gameState.resetCells()
+                appState.gameState.reset()
             }
             Spacer()
             Text("Time Step: \(appState.gameState.timeStep)")
